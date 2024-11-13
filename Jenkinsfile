@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'windows' } // エージェントはWindows環境です
+    agent any
     stages {
         stage('Build') {
             steps {
