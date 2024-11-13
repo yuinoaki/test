@@ -63,7 +63,11 @@ pipeline {
                     // コンソールログを取得し、保存
                     def jobName = env.JOB_NAME
                     def jenkinsUrl = env.JENKINS_URL
-                    def consoleTextUrl = "${jenkinsUrl}job/${jobName}/${buildNumber}/consoleText"
+                    // ジョブのフルパスを取得（スラッシュを置き換え）
+                    def jobFullPath = jobName.replaceAll('/', '/job/')
+                    // コンソールログのURLを作成
+                    def consoleTextUrl = "${jenkinsUrl}job/${jobFullPath}/${buildNumber}/consoleText"
+                    // コンソールログを取得
                     bat "curl \"${consoleTextUrl}\" --output \"${jobName}_${buildNumber}.txt\" -k"
                     // コンソールログをフォルダに移動
                     bat "move \"${jobName}_${buildNumber}.txt\" \"${folderName}\""
