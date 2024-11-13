@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent any // エージェントをanyに変更
     stages {
         stage('Build') {
             steps {
@@ -62,15 +62,17 @@ pipeline {
                     }
                     // コンソールログを取得し、保存
                     def jobName = env.JOB_NAME
+                    // ファイル名に使用できない文字を置換（スラッシュをアンダースコアに置換）
+                    def sanitizedJobName = jobName.replaceAll('[\\\\/:*?"<>|]', '_')
                     def jenkinsUrl = env.JENKINS_URL
                     // ジョブのフルパスを取得（スラッシュを置き換え）
                     def jobFullPath = jobName.replaceAll('/', '/job/')
                     // コンソールログのURLを作成
                     def consoleTextUrl = "${jenkinsUrl}job/${jobFullPath}/${buildNumber}/consoleText"
                     // コンソールログを取得
-                    bat "curl \"${consoleTextUrl}\" --output \"${jobName}_${buildNumber}.txt\" -k"
+                    bat "curl \"${consoleTextUrl}\" --output \"${sanitizedJobName}_${buildNumber}.txt\" -k"
                     // コンソールログをフォルダに移動
-                    bat "move \"${jobName}_${buildNumber}.txt\" \"${folderName}\""
+                    bat "move \"${sanitizedJobName}_${buildNumber}.txt\" \"${folderName}\""
                     // 最終的にzip化する
                     bat "powershell Compress-Archive -Path \"${folderName}\" -DestinationPath \"${folderName}.zip\""
                     // zipファイルを成果物として保存
